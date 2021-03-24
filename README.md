@@ -1,6 +1,6 @@
 # Assignment #3
 
-## Due: November 8, 2020 at 11:59pm
+## Due: ?? ?, 2021 at 11:59pm
 
 ### Repository setup:
 
@@ -40,7 +40,7 @@ Draw the following scene in the `display()` function of `Assignment3`.
 
 ### Graded Steps
 
-#### Up to 50 points of credit plus 10 points extra credit. There is no partial credit on any individual requirement. 
+#### Up to 25 points of credit. There is no partial credit on any individual requirement. 
 
 Implement the assignment in clean and understandable code. Each required part must successfully draw and show up onscreen in order to count.
 
@@ -48,62 +48,58 @@ Implement the assignment in clean and understandable code. Each required part mu
 
 #### Point distribution
 
-1. Place a spherical sun at the origin.  Use a sphere that is subdivided 4 times.  Use maximum ambient in the material.  It swells from radius 1 up to 3 over a 5 second period, and fades from blue when it's smallest to red when it's biggest. **- 5 points.**
+1. Place a spherical sun at the origin.  Use a sphere that is subdivided 4 times.  Use maximum ambient in the material.  It swells from radius 1 up to 3 over a 5 second period, and fades from blue when it's smallest to red when it's biggest. **- 2 points.**
 
-2. Make a point light source of white color located in the center of the sun, with a size parameter equal to `10**n` where n is the current sun radius.  In JavaScript, `**` is the exponent operator.  Since the light's size is changing and not the brightness, you should see the outer planets darken more than the inner ones whenever the sun shrinks. **- 5 points.**
+2. Make a point light source of white color located in the center of the sun, with a size parameter equal to `10**n` where n is the current sun radius.  In JavaScript, `**` is the exponent operator.  Since the light's size is changing and not the brightness, you should see the outer planets darken more than the inner ones whenever the sun shrinks. **- 2 points.**
 
 3. Place four orbiting planets.  Their radius shall all be 1.  The smallest orbit shall be 5 units away from the sun and each orbit after shall be 3 units farther, with each farther planet revolving at a slightly slower rate than the previous.  Leave the ambient lighting of each planet the default value of zero. **- 5 points.**
 
 4. Planet descriptions, from the innermost to the outermost:
    
-   **Planet 1:**  Icy-gray, 2 subdivisions, flat shaded, diffuse only. **- 5 points.**
+   **Planet 1:**  Icy-gray, 2 subdivisions, flat shaded, diffuse only. **- 3 points.**
 
-   ![image-1](docs/image-1.gif)
+   ![image-1](docs/image-1.png)
 
-   **Planet 2:**  Swampy green-blue, 3 subdivisions, maximum specular, low diffuse.  Apply **Gouraud shading** to it every odd second, but Phong shading every even second. **- 10 points.**
+   **Planet 2:**  Swampy green-blue, 3 subdivisions, maximum specular, low diffuse.  Apply **Gouraud shading** to it every odd second, but Phong shading every even second. **- 5 points.**
 
    >  **To Gouraud shader:**  Edit the class `Gouraud_Shader` and create the Gouraud shader from the current Phong shader template. Find the code that calculates the Phong formula.  It's in a GLSL function called `phong_model_lights()`.  Observe how either the vertex shader or fragment shader programs have the ability to call `phong_model_lights()` to compute the Phong color.  To perform Gouraud shading, make sure the color calculation occurs in the vertex shader.  Otherwise, to perform phong shading, this process waits to call `phong_model_lights()` until the fragment shader.  Remember that with Gouraud shading, the fragment shader interpolates colors; with phong shading, the fragment shader interpolates normals.
 
    ![image-2](docs/image-2.gif)
 
-   **Planet 3:**  Muddy brown-orange, 4 subdivisions, maximum diffuse and specular.  The planet must wobble on in its rotation over time (have an axis not the same as the orbit axis).  The planet must have a ring.  You can use the provided torus shape, scaled flatter (reduced z axis scale).  The ring and planet must wobble together - so base the ring's matrix directly on the planet's matrix.  Give the ring the same material as the planet, unless you make a custom shader for it for extra credit, as described below. **- 5 points.**
+   **Planet 3:**  Muddy brown-orange, 4 subdivisions, maximum diffuse and specular.  The planet must wobble on in its rotation over time (have an axis not the same as the orbit axis).  The planet must have a ring.  You can use the provided torus shape, scaled flatter (reduced z axis scale).  The ring and planet must wobble together - so base the ring's matrix directly on the planet's matrix.  Give the ring the same material as the planet. **- 1 points.**
 
    ![image-3](docs/image-3.gif)
 
-   **Planet 4:**  Soft light blue, 4 subdivisions, smooth phong, high specular.  Add a moon for this planet.  The moon has 1 subdivision, with flat shading, any material, and a small orbital distance around the planet. **- 5 points.**
+   Give your planet 3's ring a custom shader, drawing repeated faded bands on it like Saturn.  All you have to do is make sure it calculates color brightnesses in a way that varies sinusoidally with distance from the planet's center. **- 4 points.**
 
+   The `Ring_Shader` class already partially implements such a custom shader.  It works with any `Shape` that has a `position` field, and ignores all other fields.  Draw with this shader by using one of its materials (it generates blank ones, which is ok).  When used, it already passes in for the GPU to use the following values:  The shape positions, the model transform matrix, and the product of the projection and camera matrices.  These values are available in the shader's GLSL code.
+
+   Your task is to use those available variables to fill in the GLSL shader code (the JavaScript template strings returned by `vertex_glsl_code()` and `fragment_glsl_code()`).  Specifically, the `void main()` is blank for both the vertex and fragment shader programs; fill these in to cause the GPU to store within the special GPU address called `gl_Position` the correct final resting place of the vertex, and store into `gl_FragColor` the correct final color.
+   
+   For testing, you can try storing simple placeholder values into those special variables -- such as the original model space position value, converted from a `vec3` to a `vec4` like this: `vec4( object_space_pos, 1)`.
+   
+   To color the ring use the color of planet 3, multiplied by some sinusoidal scalar function of your distance calculation, so that the color fades over distance from the center.  Use the GLSL `distance()` function to compute distance.  Both position and center are variables that you should calculate and store within the vertex shader; because we declared them as varying, they will be passed on to the fragment shader and available there.
+   
+   The ring color need not be affected by lights (the sun's size), since it is using a simple shader that is not aware of lights.
+   
+   ![image-6](docs/image-6.gif)
+   
+   **Planet 4:**  Soft light blue, 4 subdivisions, smooth phong, high specular.  Add a moon for this planet.  The moon has 1 subdivision, with flat shading, any material, and a small orbital distance around the planet. **- 2 points.**
+   
    ![image-4](docs/image-4.gif)
-
-6. Camera buttons: To help us grade, we have implemented some buttons.  They are visible on your program, but they do not work at first. These buttons are intended to attach the camera to each planet, one at a time, fixed upon the front of the planet for closer viewing.
+   
+5. Camera buttons: To help us grade, we have implemented some buttons.  They are visible on your program, but they do not work at first. These buttons are intended to attach the camera to each planet, one at a time, fixed upon the front of the planet for closer viewing.
 
    In order for these buttons to start working, your `display()` function must assign new values to your camera matrix.  Your `display()` function must also fill in the following class-scope variables with the correct planet's model matrix: `"this.planet_1"` `"this.planet_2"` `"this.planet_3"` `"this.planet_4"` `"this.moon"` and, possibly, extra credit `"this.planet_5"` (see below).
 
    Once you have those, the buttons will now set the function `this.attached()` to return the matrix of the planet we want.  This is like storing a pointer to the planet's matrix that will always be up-to-date with new values of it.  In JavaScript when we want a long-term pointer to a variable we often use a function returning a variable (a closure) instead.
 
-   Now you must call `this.attached()` to assign to the camera matrix.  Only do the following when the value of `this.attached` is not undefined (so, when a button has already been pressed).  Somewhere in `display()`, compute the desired camera matrix (let's call the matrix "`desired`") by calling `this.attached()`, translating the returned value by 5 units to back away from the planet (we don't want to be inside of it), and then inverting that matrix (because it's going to be used for a camera, not a shape).  Assign that resulting value of `desired` into the variable `program_state.camera_transform` **- 10 points.**   
-
-   ![image-5](docs/image-5.gif)
+   Now you must call `this.attached()` to assign to the camera matrix.  Only do the following when the value of `this.attached` is not undefined (so, when a button has already been pressed).  Somewhere in `display()`, compute the desired camera matrix (let's call the matrix "`desired`") by calling `this.attached()`, translating the returned value by 5 units to back away from the planet (we don't want to be inside of it), and then inverting that matrix (because it's going to be used for a camera, not a shape).  Set the camera position as `desired` with function`program_state.set_camera(desired)` or update `program_state.camera_inverse` to `desired` **- 4 points.**  
 
 
-#### Extra Credit: Each can be attempted individually. There is no partial credit on any individual extra credit.
+6. This is a slight modification to what you'll do for the last sentence you just read in part 5.  This will smooth out camera transitions more and give you slightly more control while attached. Instead of directly assigning `desired` to `program_state.camera_inverse`, blend it with the existing camera matrix (from the previous frame) so that we smoothly pull the camera towards equaling `desired` instead of immediately getting there.  To mix two matrices, you can use `desired.map((x,i) => Vector.from(program_state.camera_inverse[i]).mix(x, blending_factor))` where .1 would make a good blending factor. **- 1 points.**
 
-1. This is a slight modification to what you'll do for the last sentence you just read in part 5.  This will smooth out camera transitions more and give you slightly more control while attached. Instead of directly assigning `desired` to `program_state.camera_transform`, blend it with the existing camera matrix (from the previous frame) so that we smoothly pull the camera towards equaling `desired` instead of immediately getting there.  To mix two matrices, you can use `desired.map( (x,i) => Vector.from( program_state.camera_transform[i] ).mix( x, blending_factor ) )` where .1 would make a good blending factor. **- 2 points.**
-
-   >  NOTE: At a blending speed of .1, you will still have some leeway to control the camera while attached (especially mouse steering), although it will tend to pull you back to viewing the selected planet.  As you press the buttons, see if you can notice any undesired effects of blending matrices this way to generate intermediate camera matrices -- a subtle problem can be seen because our code snippet above uses linear blending instead of quaternions.
-
-2. Give your planet 3's ring a custom shader, drawing repeated faded bands on it like Saturn.  All you have to do is make sure it calculates color brightnesses in a way that varies sinusoidally with distance from the planet's center. **- 8 points.**
-
-   The `Ring_Shader` class already partially implements such a custom shader.  It works with any `Shape` that has a `position` field, and ignores all other fields.  Draw with this shader by using one of its materials (it generates blank ones, which is ok).  When used, it already passes in for the GPU to use the following values:  The shape positions, the model transform matrix, and the product of the projection and camera matrices.  These values are available in the shader's GLSL code.
-
-   Your task is to use those available variables to fill in the GLSL shader code (the JavaScript template strings returned by `vertex_glsl_code()` and `fragment_glsl_code()`).  Specifically, the `void main()` is blank for both the vertex and fragment shader programs; fill these in to cause the GPU to store within the special GPU address called `gl_Position` the correct final resting place of the vertex, and store into `gl_FragColor` the correct final color.
-
-   For testing, you can try storing simple placeholder values into those special variables -- such as the original model space position value, converted from a `vec3` to a `vec4` like this: `vec4( object_space_pos, 1)`.
-
-   To color the ring use the color of planet 3, multiplied by some sinusoidal scalar function of your distance calculation, so that the color fades over distance from the center.  Use the GLSL `distance()` function to compute distance.  Both position and center are variables that you should calculate and store within the vertex shader; because we declared them as varying, they will be passed on to the fragment shader and available there.
-
-   The ring color need not be affected by lights (the sun's size), since it is using a simple shader that is not aware of lights.
-
-   ![image-6](docs/image-6.gif)
+   NOTE: At a blending speed of .1, you will still have some leeway to control the camera while attached (especially mouse steering), although it will tend to pull you back to viewing the selected planet.  As you press the buttons, see if you can notice any undesired effects of blending matrices this way to generate intermediate camera matrices -- a subtle problem can be seen because our code snippet above uses linear blending instead of quaternions.
 
 
 

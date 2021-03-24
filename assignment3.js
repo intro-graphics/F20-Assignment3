@@ -43,7 +43,6 @@ export class Assignment3 extends Scene {
         this.key_triggered_button("Attach to planet 3", ["Control", "3"], () => this.attached = () => this.planet_3);
         this.key_triggered_button("Attach to planet 4", ["Control", "4"], () => this.attached = () => this.planet_4);
         this.new_line();
-        this.key_triggered_button("Attach to planet 5", ["Control", "5"], () => this.attached = () => this.planet_5);
         this.key_triggered_button("Attach to moon", ["Control", "m"], () => this.attached = () => this.moon);
     }
 
@@ -223,6 +222,7 @@ class Ring_Shader extends Shader {
         // update_GPU():  Defining how to synchronize our JavaScript's variables to the GPU's:
         const [P, C, M] = [graphics_state.projection_transform, graphics_state.camera_inverse, model_transform],
             PCM = P.times(C).times(M);
+        context.uniformMatrix4fv(gpu_addresses.model_transform, false, Matrix.flatten_2D_to_1D(model_transform.transposed()));
         context.uniformMatrix4fv(gpu_addresses.projection_camera_model_transform, false,
             Matrix.flatten_2D_to_1D(PCM.transposed()));
     }
